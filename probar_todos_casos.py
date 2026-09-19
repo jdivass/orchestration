@@ -65,3 +65,25 @@ def test_dates() -> None:
             print(f"{name:<22} {value} -> ACEPTADA ({accepted})")
         except ValueError as exc:
             print(f"{name:<22} {value} -> RECHAZADA ({exc})")
+
+
+def test_live_forecast() -> None:
+    print("\n=== PRONÓSTICO REAL OPEN-METEO ===")
+    today = dt.date.today()
+    for offset in range(0, MAX_FORECAST_DAYS + 1):
+        date = today + dt.timedelta(days=offset)
+        result = json.loads(weather_tool(date.isoformat()))
+        if "error" in result:
+            print(f"{date}: ERROR -> {result['error']}")
+        else:
+            print(f"{date}: {result['decision']} | viento={result['wind_speed_kmh']} km/h | ráfagas={result['wind_gust_kmh']} km/h | lluvia={result['precipitation_mm']} mm | nubes={result['cloud_cover_pct']}%")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--live", action="store_true", help="consulta las 17 fechas reales disponibles")
+    args = parser.parse_args()
+    test_weather_rules()
+    test_dates()
+    if args.live:
+        test_live_forecast()
